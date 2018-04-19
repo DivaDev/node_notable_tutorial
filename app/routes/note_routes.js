@@ -41,14 +41,21 @@ module.exports = function(app, db) {
     app.put('/notes/:id', (req, res) => { //UPDATE route
         const id = req.params.id;
         const details = { '_id': new ObjectID(id) };
-        const note = { text: req.body.body, title: req.body.title };
         
-        db.collection('notes').update(details, note, (err, result) => { //if found update, otherwise create the note again
-            if(err) {
-                res.send({'error': 'An error has occurred'});
-            } else {
-                res.send(note);
-            }
-        })
+        //error checking
+        if (req.body.body != null && req.body.title != null) {
+            const note = { text: req.body.body, title: req.body.title };
+            db.collection('notes').update(details, note, (err, result) => { //if found update, otherwise create the note
+                if(err) {
+                    res.send({'error': 'An error has occurred'});
+                } else {
+                    res.send(note);
+                }
+            });
+        } else {
+            res.send({'error': 'Invalid request! In order to update this note, both the title and body must not be null!'});
+        }
+        
+        
     })
 };
